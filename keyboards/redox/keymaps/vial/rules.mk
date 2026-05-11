@@ -1,6 +1,7 @@
 VIA_ENABLE = yes
 VIAL_ENABLE = yes
 LTO_ENABLE = yes
+RAW_ENABLE = yes
 
 MOUSEKEY_ENABLE = no       # Mouse keys
 COMMAND_ENABLE = no        # Commands for debug and configuration

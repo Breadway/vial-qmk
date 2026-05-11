@@ -1,4 +1,7 @@
+#include <string.h>
+
 #include QMK_KEYBOARD_H
+#include "raw_hid.h"
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -27,6 +30,29 @@ enum custom_keycodes {
 
 #define KC_ADEN LT(_ADJUST, KC_END)
 #define KC_ADPU LT(_ADJUST, KC_PGUP)
+#define LAYER_REPORT_SIZE 32
+
+enum {
+  REPORT_ID_LAYER_STATE = 0x01,
+};
+
+static void send_layer_state_report(layer_state_t current_layer_state, layer_state_t current_default_layer_state) {
+  uint8_t report[LAYER_REPORT_SIZE] = {0};
+  uint8_t active_layer = current_layer_state ? get_highest_layer(current_layer_state) : 0;
+  uint8_t default_layer = current_default_layer_state ? get_highest_layer(current_default_layer_state) : 0;
+  uint8_t effective_layer = current_layer_state ? active_layer : default_layer;
+
+  report[0] = REPORT_ID_LAYER_STATE;
+  report[1] = effective_layer;
+  report[2] = active_layer;
+  report[3] = default_layer;
+  memcpy(&report[4], &current_layer_state, sizeof(layer_state_t));
+  memcpy(&report[8], &current_default_layer_state, sizeof(layer_state_t));
+
+  if (is_keyboard_master()) {
+    raw_hid_send(report, sizeof(report));
+  }
+}
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -86,3 +112,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //└────────┴────────┴────────┴────────┘    └────────┘   └────────┴────────┘       └────────┴────────┘   └────────┘    └────────┴────────┴────────┴────────┘
   )
 };
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+  send_layer_state_report(state, default_layer_state);
+  return state;
+}
+
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+  send_layer_state_report(layer_state, state);
+  return state;
+}
+
+void keyboard_post_init_user(void) {
+  send_layer_state_report(layer_state, default_layer_state);
+}
