@@ -39,6 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VIAL_UNLOCK_COMBO_COLS {0, 0}
 
 /* For reducing RAM and EEPROM usage when using Vial*/
-//#define VIAL_TAP_DANCE_ENTRIES 4
-//#define VIAL_COMBO_ENTRIES 4
-//#define VIAL_KEY_OVERRIDE_ENTRIES 4
+#define VIAL_TAP_DANCE_ENTRIES 4
+#define VIAL_COMBO_ENTRIES 0
+#define VIAL_KEY_OVERRIDE_ENTRIES 0
+#define DYNAMIC_KEYMAP_MACRO_COUNT 4
+#define DYNAMIC_KEYMAP_LAYER_COUNT 5
